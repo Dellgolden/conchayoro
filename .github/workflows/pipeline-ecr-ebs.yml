@@ -55,7 +55,7 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: '3.10'
-      - name: "Install pip and awsebcli" #workaround: awsebcli não funciona com versões do pyyaml > 5.3
+      - name: "Install pip and awsebcli" #workaround awsebcli não funciona com versões do pyyaml > 5.3
         run: |
             sudo wget https://bootstrap.pypa.io/get-pip.py  
   
