@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/Dellgolden/conchayoro/issues"
   },
-  "homepage": "https://github.com/Dellgolden/conchayoro#readme"
+  "homepage": "https://github.com/Dellgolden/conchayoro#readme",
+  "dependencies": {
+    "next": "^15.3.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
 }
