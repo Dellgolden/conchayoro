@@ -1,0 +1,36 @@
+name: destroy ecr-eb
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+  MODULE_NAME: ${{ vars.MODULE_NAME }}
+  S3_BUCKET: ${{ vars.S3_BUCKET }}
+  STACK_NAME: ${{ vars.STACK_NAME }}
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    env:
+      TF_VAR_AWS_REGION: ${{ vars.AWS_REGION }}
+      TF_VAR_PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+      TF_VAR_MODULE_NAME: ${{ vars.MODULE_NAME }}
+      TF_VAR_SOLUTION_STACK_NAME: ${{ vars.STACK_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: |
+          terraform -chdir=.environment init \
+            -backend-config="bucket=${{ vars.S3_BUCKET }}" \
+            -backend-config="key=state/terraform.tfstate" \
+            -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - run: |
+          terraform -chdir=.environment destroy -auto-approve
