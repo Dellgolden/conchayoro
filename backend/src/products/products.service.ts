@@ -1,3 +1,4 @@
+// src/products/products.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -11,32 +12,26 @@ export class ProductsService {
     private readonly productModel: typeof Product,
   ) {}
 
-  create(createProductDto: CreateProductDto): Promise<Product> {
-    const product = {
-      name: createProductDto.name,
-      price: createProductDto.price,
-      category: createProductDto.category,
-      rating: createProductDto.rating,
-    };
-    return this.productModel.create(product);
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    // Pode passar o DTO direto com cast, já que os campos estão corretamente definidos
+    return this.productModel.create(createProductDto as any);
   }
 
   async findAll(): Promise<Product[]> {
     return this.productModel.findAll();
   }
 
-  // Método findOne corrigido:
   async findOne(id: string): Promise<Product> {
-    const product = await this.productModel.findOne({
-      where: {
-        id,
-      },
-    });
-
+    const product = await this.productModel.findByPk(id);
     if (!product) {
       throw new NotFoundException(`Produto com id ${id} não encontrado`);
     }
+    return product;
+  }
 
+  async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
+    const product = await this.findOne(id);
+    await product.update(updateProductDto);
     return product;
   }
 
@@ -45,15 +40,22 @@ export class ProductsService {
     await product.destroy();
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
-    const product = await this.findOne(id);
-    const productUpdated = {
-      name: updateProductDto.name,
-      price: updateProductDto.price,
-      category: updateProductDto.category,
-      rating: updateProductDto.rating,
-    };
-    await product.update(productUpdated);
-    return product;
+  async findByCriteria(criteria: Partial<Product>): Promise<Product[]> {
+    const whereClause: any = {};
+
+    if (criteria.name) {
+      whereClause.name = criteria.name;
+    }
+    if (criteria.category) {
+      whereClause.category = criteria.category;
+    }
+    if (criteria.price) {
+      whereClause.price = criteria.price;
+    }
+    if (criteria.rating) {
+      whereClause.rating = criteria.rating;
+    }
+
+    return this.productModel.findAll({ where: whereClause });
   }
 }
