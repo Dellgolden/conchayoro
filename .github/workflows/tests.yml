@@ -1,4 +1,4 @@
-name: Pipeline-testes
+name: pipeline-testes
 
 on:
   push:
