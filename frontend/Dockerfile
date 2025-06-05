@@ -20,11 +20,9 @@ RUN npm run build
 # Etapa final com nginx
 FROM nginx:1.19.3-alpine AS production-stage
 
-# Copia arquivos para servir no Nginx
+# Copia arquivos da build para o Nginx
 COPY --from=build-stage /app/out /usr/share/nginx/html
 
-# Expõe a porta padrão
 EXPOSE 80
 
-# Inicia o servidor Nginx
 CMD ["nginx", "-g", "daemon off;"]
